@@ -1,13 +1,8 @@
 using UnityEngine;
 
-public class PlayerGroundedState : PlayerState
+public class PlayerMoveState : PlayerGroundedState
 {
-    protected Vector2 MovementInput;
-    protected float moveAmount;
-
-    private bool isGrounded;
-
-    public PlayerGroundedState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerMoveState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -40,20 +35,17 @@ public class PlayerGroundedState : PlayerState
     {
         base.LogicUpdate();
 
-        MovementInput = player.InputManager.MovementInput;
-        moveAmount = player.InputManager.moveAmount;
-        isGrounded = player.isGrounded();
+        player.SetMovement(playerData.moveSpeed);
+        player.SetRotation(playerData.movementRotation);
 
-        if (!isGrounded)
+        if (moveAmount == 0)
         {
-            player.HandleGravity();
+            StateMachine.ChangeState(player.IdleState);
         }
-        
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
     }
-
 }

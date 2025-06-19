@@ -1,12 +1,14 @@
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInputManager), typeof(Animator))]
+[RequireComponent(typeof(CharacterController))]
 public class Player : MonoBehaviour
 {
     #region Player States
 
     public PlayerStateMachine StateMachine;
-    public PlayerLocomotionState LocomotionState;
+    public PlayerIdleState IdleState;
+    public PlayerMoveState MoveState;
 
     #endregion
 
@@ -16,9 +18,17 @@ public class Player : MonoBehaviour
 
     #endregion
 
+    #region Private Variables
+
+    private Vector3 playerVelocity;
+
+    #endregion
+
     #region Inspector References
 
     [SerializeField] PlayerData playerData;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] Transform playerCamera;
 
     #endregion
 
@@ -31,6 +41,7 @@ public class Player : MonoBehaviour
 
     public Animator animator { get; private set; }
     public PlayerInputManager InputManager { get; private set; }
+    public CharacterController characterController { get; private set; }
 
     #endregion
 
@@ -39,15 +50,17 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         StateMachine = new PlayerStateMachine();
-        LocomotionState = new PlayerLocomotionState(this, StateMachine, playerData, "move");
+        IdleState = new PlayerIdleState(this, StateMachine, playerData, "idle");
+        MoveState = new PlayerMoveState(this, StateMachine, playerData, "move");
     }
 
     private void Start()
     {
         animator = GetComponent<Animator>();
         InputManager = GetComponent<PlayerInputManager>();
+        characterController = GetComponent<CharacterController>();
 
-        StateMachine.InitializeState(LocomotionState);
+        StateMachine.InitializeState(IdleState);
         StateMachine.CurrentState.Enter();
     }
 
@@ -59,6 +72,81 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         StateMachine.CurrentState.PhysicsUpdate();
+    }
+
+    #endregion
+
+    #region Public Functions
+
+    public void HandleGravity()
+    {
+        playerVelocity.y = playerVelocity.y + playerData.gravity * Time.deltaTime;
+        if (isGrounded() && playerVelocity.y < 0)
+        {
+            playerVelocity.y = playerData.downwardForce;
+        }
+        characterController.Move(playerVelocity * Time.deltaTime);
+
+    }
+
+    public void SetMovement(float movementSpeed)
+    {
+        Vector3 moveDirection;
+        moveDirection = playerCamera.forward * InputManager.MovementInput.y;
+        moveDirection = moveDirection + playerCamera.right * InputManager.MovementInput.x;
+        moveDirection.Normalize();
+        moveDirection = moveDirection * movementSpeed;
+
+        Vector3 movementVelocity = moveDirection;
+        characterController.Move(movementVelocity * Time.deltaTime);
+    }
+
+    public void SetRotation(float rotationSpeed)
+    {
+        Vector3 targetDirection = Vector3.zero;
+
+        targetDirection = playerCamera.forward * InputManager.MovementInput.y;
+        targetDirection = targetDirection + playerCamera.right * InputManager.MovementInput.x;
+        targetDirection.Normalize();
+        targetDirection.y = 0;
+
+        if (targetDirection == Vector3.zero)
+        {
+            targetDirection = transform.forward;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        transform.rotation = playerRotation;
+    }
+
+    #endregion
+
+    #region Do Check Functions
+
+    public bool isGrounded()
+    {
+        Collider[] hitColliders = new Collider[10];
+        int numColliders = Physics.OverlapSphereNonAlloc(groundCheck.position, playerData.groundCheckRadius, hitColliders, playerData.whatIsGround);
+
+        foreach (Collider collider in hitColliders)
+        {
+            if (collider != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        if (characterController.isGrounded)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     #endregion

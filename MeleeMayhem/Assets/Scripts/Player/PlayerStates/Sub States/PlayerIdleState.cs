@@ -1,10 +1,8 @@
 using UnityEngine;
 
-public class PlayerLocomotionState : PlayerGroundedState
+public class PlayerIdleState : PlayerGroundedState
 {
-    public float speedUpgrade;
-
-    public PlayerLocomotionState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
+    public PlayerIdleState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
 
@@ -26,7 +24,6 @@ public class PlayerLocomotionState : PlayerGroundedState
     public override void Enter()
     {
         base.Enter();
-        player.animator.SetFloat("moveX", 0);
     }
 
     public override void Exit()
@@ -37,6 +34,11 @@ public class PlayerLocomotionState : PlayerGroundedState
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+
+        if (moveAmount > 0)
+        {
+            StateMachine.ChangeState(player.MoveState);
+        }
     }
 
     public override void PhysicsUpdate()

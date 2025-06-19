@@ -6,7 +6,7 @@ public class PlayerInputManager : MonoBehaviour
     #region Input Flags
 
     public Vector2 MovementInput { get; private set; }
-    public float moveAmount { get; private set; }
+    public float moveAmount;
 
     #endregion
 
