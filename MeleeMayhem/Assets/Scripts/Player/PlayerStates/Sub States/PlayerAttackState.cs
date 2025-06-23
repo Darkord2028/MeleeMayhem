@@ -10,11 +10,15 @@ public class PlayerAttackState : PlayerGroundedState
     public override void AnimationFinishTrigger()
     {
         base.AnimationFinishTrigger();
+
+        if (target == null) StateMachine.ChangeState(player.IdleState);
     }
 
     public override void AnimationTrigger()
     {
         base.AnimationTrigger();
+
+        player.PerformPunchCombo();
     }
 
     public override void DoChecks()
@@ -25,8 +29,6 @@ public class PlayerAttackState : PlayerGroundedState
     public override void Enter()
     {
         base.Enter();
-
-        Debug.Log("Player is attacking");
     }
 
     public override void Exit()

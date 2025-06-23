@@ -6,8 +6,6 @@ public class PlayerGroundedState : PlayerState
     protected float moveAmount;
     protected Transform target;
 
-    private bool isGrounded;
-
     public PlayerGroundedState(Player player, PlayerStateMachine stateMachine, PlayerData playerData, string animBoolName) : base(player, stateMachine, playerData, animBoolName)
     {
     }
@@ -43,12 +41,6 @@ public class PlayerGroundedState : PlayerState
 
         MovementInput = player.InputManager.MovementInput;
         moveAmount = player.InputManager.moveAmount;
-        isGrounded = player.isGrounded();
-
-        if (!isGrounded)
-        {
-            player.HandleGravity();
-        }
     }
 
     public override void PhysicsUpdate()

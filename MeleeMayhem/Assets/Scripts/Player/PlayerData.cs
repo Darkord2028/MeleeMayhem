@@ -21,4 +21,8 @@ public class PlayerData : ScriptableObject
     [Header("Snap to Enemy State")]
     public float snapDistance = 1.5f;
 
+    [Header("Attack State")]
+    public float punchRadius = 0.25f;
+    public float punchComboDamage = 2f;
+
 }

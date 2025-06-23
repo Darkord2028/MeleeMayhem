@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInputManager), typeof(Animator))]
@@ -19,13 +18,16 @@ public class Player : MonoBehaviour
 
     public bool debugAnimBoolName;
 
+    [Header("Hit Box")]
+    [SerializeField] Transform punchHitBox;
+
     #endregion
 
     #region Private Variables
 
     private Vector3 playerVelocity;
 
-    private Collider[] results = new Collider[10];
+    private Collider[] hitResults = new Collider[10];
 
     #endregion
 
@@ -85,17 +87,6 @@ public class Player : MonoBehaviour
 
     #region Public Functions
 
-    public void HandleGravity()
-    {
-        playerVelocity.y = playerVelocity.y + playerData.gravity * Time.deltaTime;
-        if (isGrounded() && playerVelocity.y < 0)
-        {
-            playerVelocity.y = playerData.downwardForce;
-        }
-        characterController.Move(playerVelocity * Time.deltaTime);
-
-    }
-
     public void SetMovement(float movementSpeed)
     {
         Vector3 moveDirection;
@@ -143,45 +134,33 @@ public class Player : MonoBehaviour
         transform.position = targetPosition;
     }
 
+    public void PerformPunchCombo()
+    {
+        int hits = Physics.OverlapSphereNonAlloc(punchHitBox.position, playerData.punchRadius, hitResults, playerData.enemyMask);
+
+        for (int i = 0; i < hits; i++)
+        {
+            if (hitResults[i].TryGetComponent<IDamagable>(out IDamagable damagable))
+            {
+                damagable.TakeDamage(playerData.punchComboDamage);
+            }
+        }
+    }
+
     #endregion
 
     #region Do Check Functions
-
-    public bool isGrounded()
-    {
-        Collider[] hitColliders = new Collider[10];
-        int numColliders = Physics.OverlapSphereNonAlloc(groundCheck.position, playerData.groundCheckRadius, hitColliders, playerData.whatIsGround);
-
-        foreach (Collider collider in hitColliders)
-        {
-            if (collider != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        if (characterController.isGrounded)
-        {
-            return true;
-        }
-
-        return false;
-    }
 
     public Transform FindClosestEnemy()
     {
         Transform closestEnemy = null;
         float closestDistanceSqr = Mathf.Infinity;
 
-        int hitCount = Physics.OverlapSphereNonAlloc(transform.position, playerData.viewRadius, results, playerData.enemyMask);
+        int hitCount = Physics.OverlapSphereNonAlloc(transform.position, playerData.viewRadius, hitResults, playerData.enemyMask);
 
         for (int i = 0; i < hitCount; i++)
         {
-            Transform target = results[i].transform;
+            Transform target = hitResults[i].transform;
             float distToTarget = Vector3.Distance(transform.position, target.position);
 
             if (distToTarget < closestDistanceSqr)
@@ -217,6 +196,9 @@ public class Player : MonoBehaviour
         Gizmos.color = Color.yellow;
 
         Gizmos.DrawWireSphere(transform.position, playerData.viewRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(punchHitBox.transform.position, playerData.punchRadius);
     }
 
     #endregion
