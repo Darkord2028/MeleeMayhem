@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7768d6c9a4c713f4981bba872c5f002c, type: 3}
   m_Name: BaseData
   m_EditorClassIdentifier: 
+  interval: 3
   gravity: -10
   downwardForce: 0.1
   groundCheckRadius: 2
+  viewRadius: 5
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 128
   moveSpeed: 7
   movementRotation: 15

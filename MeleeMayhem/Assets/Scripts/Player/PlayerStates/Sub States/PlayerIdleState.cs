@@ -39,6 +39,15 @@ public class PlayerIdleState : PlayerGroundedState
         {
             StateMachine.ChangeState(player.MoveState);
         }
+        if (Time.frameCount % playerData.interval == 0)
+        {
+            target = player.FindClosestEnemy();
+
+            if (target != null)
+            {
+                StateMachine.ChangeState(player.AttackState);
+            }
+        }
     }
 
     public override void PhysicsUpdate()

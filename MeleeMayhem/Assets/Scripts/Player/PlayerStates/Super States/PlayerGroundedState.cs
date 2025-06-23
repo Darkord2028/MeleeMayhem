@@ -4,6 +4,7 @@ public class PlayerGroundedState : PlayerState
 {
     protected Vector2 MovementInput;
     protected float moveAmount;
+    protected Transform target;
 
     private bool isGrounded;
 
@@ -48,12 +49,10 @@ public class PlayerGroundedState : PlayerState
         {
             player.HandleGravity();
         }
-        
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
     }
-
 }

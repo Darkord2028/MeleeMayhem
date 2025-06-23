@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInputManager), typeof(Animator))]
@@ -9,6 +10,7 @@ public class Player : MonoBehaviour
     public PlayerStateMachine StateMachine;
     public PlayerIdleState IdleState;
     public PlayerMoveState MoveState;
+    public PlayerAttackState AttackState;
 
     #endregion
 
@@ -22,6 +24,8 @@ public class Player : MonoBehaviour
 
     private Vector3 playerVelocity;
 
+    private Collider[] results = new Collider[10];
+
     #endregion
 
     #region Inspector References
@@ -32,7 +36,7 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region Get Variables
+    #region Public Get Variables
 
 
     #endregion
@@ -52,6 +56,7 @@ public class Player : MonoBehaviour
         StateMachine = new PlayerStateMachine();
         IdleState = new PlayerIdleState(this, StateMachine, playerData, "idle");
         MoveState = new PlayerMoveState(this, StateMachine, playerData, "move");
+        AttackState = new PlayerAttackState(this, StateMachine, playerData, "attack");
     }
 
     private void Start()
@@ -149,6 +154,28 @@ public class Player : MonoBehaviour
         return false;
     }
 
+    public Transform FindClosestEnemy()
+    {
+        Transform closestEnemy = null;
+        float closestDistanceSqr = Mathf.Infinity;
+
+        int hitCount = Physics.OverlapSphereNonAlloc(transform.position, playerData.viewRadius, results, playerData.enemyMask);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Transform target = results[i].transform;
+            float distToTarget = Vector3.Distance(transform.position, target.position);
+
+            if (distToTarget < closestDistanceSqr)
+            {
+                closestDistanceSqr = distToTarget;
+                closestEnemy = target;
+            }
+        }
+
+        return closestEnemy;
+    }
+
     #endregion
 
     #region Animation Events
@@ -161,6 +188,17 @@ public class Player : MonoBehaviour
     public void OnFinishAnimationTrigger()
     {
         StateMachine.CurrentState.AnimationFinishTrigger();
+    }
+
+    #endregion
+
+    #region Gizmos
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+
+        Gizmos.DrawWireSphere(transform.position, playerData.viewRadius);
     }
 
     #endregion
