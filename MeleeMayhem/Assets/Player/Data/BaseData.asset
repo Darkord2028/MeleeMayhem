@@ -16,7 +16,7 @@ MonoBehaviour:
   gravity: -10
   downwardForce: 0.1
   groundCheckRadius: 2
-  viewRadius: 5
+  viewRadius: 2.5
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
@@ -25,6 +25,6 @@ MonoBehaviour:
     m_Bits: 128
   moveSpeed: 7
   movementRotation: 15
-  snapDistance: 1.5
+  snapDistance: 0.5
   punchRadius: 0.25
-  punchComboDamage: 50
+  punchComboDamage: 25
