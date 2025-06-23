@@ -37,6 +37,6 @@ public class Enemy : MonoBehaviour, IDamagable
     {
         isDead = true;
         OnDeath?.Invoke(this.gameObject);
-        Debug.Log($"{gameObject.name} has died.");
+        gameObject.SetActive(false);
     }
 }
