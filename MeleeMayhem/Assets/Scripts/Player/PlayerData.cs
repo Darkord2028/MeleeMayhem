@@ -18,4 +18,7 @@ public class PlayerData : ScriptableObject
     public float moveSpeed;
     public float movementRotation;
 
+    [Header("Snap to Enemy State")]
+    public float snapDistance = 1.5f;
+
 }

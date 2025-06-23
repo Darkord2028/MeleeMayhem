@@ -45,7 +45,7 @@ public class PlayerIdleState : PlayerGroundedState
 
             if (target != null)
             {
-                StateMachine.ChangeState(player.AttackState);
+                StateMachine.ChangeState(player.SnapToEnemyState);
             }
         }
     }

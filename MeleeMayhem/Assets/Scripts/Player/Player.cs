@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     public PlayerIdleState IdleState;
     public PlayerMoveState MoveState;
     public PlayerAttackState AttackState;
+    public PlayerSnapToEnemyState SnapToEnemyState;
 
     #endregion
 
@@ -57,6 +58,7 @@ public class Player : MonoBehaviour
         IdleState = new PlayerIdleState(this, StateMachine, playerData, "idle");
         MoveState = new PlayerMoveState(this, StateMachine, playerData, "move");
         AttackState = new PlayerAttackState(this, StateMachine, playerData, "attack");
+        SnapToEnemyState = new PlayerSnapToEnemyState(this, StateMachine, playerData, "snapToEnemy");
     }
 
     private void Start()
@@ -123,6 +125,22 @@ public class Player : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         transform.rotation = playerRotation;
+    }
+
+    public void SnapNearEnemy(Transform target, float stopDistance = 1.5f)
+    {
+        if (target == null) return;
+
+        Vector3 direction = (target.position - transform.position).normalized;
+        direction.y = 0f;
+
+        Vector3 lookAtPosition = new Vector3(target.position.x, transform.position.y, target.position.z);
+        transform.LookAt(lookAtPosition);
+
+        Vector3 targetPosition = target.position - direction * stopDistance;
+        targetPosition.y = transform.position.y;
+
+        transform.position = targetPosition;
     }
 
     #endregion
